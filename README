@@ -1,0 +1,16 @@
+#to set the environment from here, install virtualdev, pyramid, flask and django
+#by following these steps: (if needed install pip first)
+
+$ [sudo] pip install virtualenv
+$ mkdir ~/envs
+$ virtualenv ~/envs/lsbaws/
+$ cd ~/envs/lsbaws/
+$ ls
+bin  include  lib
+$ source bin/activate
+(lsbaws) $ pip install pyramid
+(lsbaws) $ pip install flask
+(lsbaws) $ pip install django
+
+#to run server:
+python webserver3h.py flaskapp:app
