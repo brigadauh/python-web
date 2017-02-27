@@ -1,10 +1,8 @@
-from flask import Flask
-from flask import Response
-from flask import request
+from dispatcher import dispatch
+from flask import Flask, render_template
 import os
 import datetime
 import db
-from dispatcher import dispatch
 
 #from mysql.connector import errorcode
 
@@ -15,21 +13,21 @@ cursor = conn.cursor()
 
 query =("select username,password from user "
         "where username=%s and password=%s;")
-username="petya"
-password="qwerty"
-date=datetime.date(2000,12,31)
+username = "petya"
+password = "qwerty"
+date = datetime.date(2000,12,31)
 
 cursor.execute(query, (username, password))
-for (username, password) in cursor:
+for (user, pwd) in cursor:
   print("user: {}, pwd: {} ".format(
-    username, '****'))
+    user, '****'))
     
 cursor.close()
 
 ##db.close(conn)
 
 
-flask_app=Flask(__name__, static_url_path='', static_folder='public')
+flask_app = Flask(__name__, static_url_path='', static_folder='public')
+#app = flask_app.wsgi_app
 dispatch(flask_app,'')
-
-app = flask_app.wsgi_app
+flask_app.run(host='192.168.1.3', port=int(os.environ.get("PORT", 8888)))

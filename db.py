@@ -5,7 +5,7 @@ mysqlConfig = {
   'password': '',
   'host': '192.168.1.3',
   'database': 'sapi',
-  'raise_on_warnings': True,
+  'raise_on_warnings': False,
   'pool_name': 'sapi_pool',
   'pool_size':5
 }
