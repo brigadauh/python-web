@@ -8,18 +8,24 @@ def list_active():
     query =("select task_id,name,description, exec_method, exec_date from scheduled_tasks "
             "where exec_date > NOW() order by exec_date;")
     cursor.execute(query)
-    resp='['
-    comma=''
+    respObj={}
+    respObj["status"]="ok"
+    dataObj=[]
+
     for (var_task_id, var_name, var_description, var_exec_method, var_exec_date ) in cursor:
-      print("task: {}, name: {}, description: {}, method: {}, time: {} ".format(
-        var_task_id, var_name, var_description, var_exec_method, var_exec_date))
-      resp=resp+comma+'{"task_id": "'+str(var_task_id)+'","name": "'+var_name+'", "description":"'+var_description+'","exec_method": "'+var_exec_method+'","exec_date": "'+str(var_exec_date)+'"}'
-      comma=','
-      #print("{}, {} was hired on {:%d %b %Y}".format(
-      #  last_name, first_name, hire_date))
-    resp=resp+']'
+        #print("task: {}, name: {}, description: {}, method: {}, time: {} ".format(
+        #var_task_id, var_name, var_description, var_exec_method, var_exec_date))
+        dataItem={}
+        dataItem["task_id"]=str(var_task_id)
+        dataItem["name"]=var_name
+        dataItem["description"]=var_description
+        dataItem["exec_method"]=var_exec_method
+        dataItem["exec_date"]=str(var_exec_date)
+        dataObj.append(dataItem)
+
+    respObj["data"]=dataObj
     cursor.close()
-    return resp
+    return json.dumps(respObj)
 
 def list_processed():
     conn = db.open()
@@ -27,18 +33,24 @@ def list_processed():
     query =("select task_id,name,description, exec_method, exec_date from scheduled_tasks "
             "where exec_date <= NOW() and status=1 order by exec_date desc;")
     cursor.execute(query)
-    resp='['
-    comma=''
+    respObj={}
+    respObj["status"]="ok"
+    dataObj=[]
+
     for (var_task_id, var_name, var_description, var_exec_method, var_exec_date ) in cursor:
-      print("task: {}, name: {}, description: {}, method: {}, time: {} ".format(
-        var_task_id, var_name, var_description, var_exec_method, var_exec_date))
-      resp=resp+comma+'{"task_id": "'+str(var_task_id)+'","name": "'+var_name+'", "description":"'+var_description+'","exec_method": "'+var_exec_method+'","exec_date": "'+str(var_exec_date)+'"}'
-      comma=','
-      #print("{}, {} was hired on {:%d %b %Y}".format(
-      #  last_name, first_name, hire_date))
-    resp=resp+']'
+        #print("task: {}, name: {}, description: {}, method: {}, time: {} ".format(
+        #var_task_id, var_name, var_description, var_exec_method, var_exec_date))
+        dataItem={}
+        dataItem["task_id"]=str(var_task_id)
+        dataItem["name"]=var_name
+        dataItem["description"]=var_description
+        dataItem["exec_method"]=var_exec_method
+        dataItem["exec_date"]=str(var_exec_date)
+        dataObj.append(dataItem)
+
+    respObj["data"]=dataObj
     cursor.close()
-    return resp
+    return json.dumps(respObj)
 
 def list_current():
     conn = db.open()
@@ -46,18 +58,24 @@ def list_current():
     query =("select task_id,name,description, exec_method, exec_date from scheduled_tasks "
             "where exec_date <= NOW() and status=0 order by exec_date desc;")
     cursor.execute(query)
-    resp='['
-    comma=''
+    respObj={}
+    respObj["status"]="ok"
+    dataObj=[]
+
     for (var_task_id, var_name, var_description, var_exec_method, var_exec_date ) in cursor:
-      print("task: {}, name: {}, description: {}, method: {}, time: {} ".format(
-        var_task_id, var_name, var_description, var_exec_method, var_exec_date))
-      resp=resp+comma+'{"task_id": "'+str(var_task_id)+'","name": "'+var_name+'", "description":"'+var_description+'","exec_method": "'+var_exec_method+'","exec_date": "'+str(var_exec_date)+'"}'
-      comma=','
-      #print("{}, {} was hired on {:%d %b %Y}".format(
-      #  last_name, first_name, hire_date))
-    resp=resp+']'
+        #print("task: {}, name: {}, description: {}, method: {}, time: {} ".format(
+        #var_task_id, var_name, var_description, var_exec_method, var_exec_date))
+        dataItem={}
+        dataItem["task_id"]=str(var_task_id)
+        dataItem["name"]=var_name
+        dataItem["description"]=var_description
+        dataItem["exec_method"]=var_exec_method
+        dataItem["exec_date"]=str(var_exec_date)
+        dataObj.append(dataItem)
+
+    respObj["data"]=dataObj
     cursor.close()
-    return resp
+    return json.dumps(respObj)
 
 def add(data):
     name=data.get('name','')
@@ -76,9 +94,14 @@ def add(data):
     conn.commit()
     conn.close()
     var_task_id=cursor.lastrowid
-    resp='{"status":"ok","data":[{"task_id": "'+str(var_task_id)+'"}]'
+    respObj={}
+    respObj["status"]="ok"
+    dataObj=[]
+    dataObj["task_id"]=str(var_task_id)
+    respObj["data"]=dataObj
+
     cursor.close()
-    return resp
+    return json.dumps(respObj)
 def delete(data):
     task_id=data.get('task_id','')
     conn = db.open()
@@ -89,6 +112,9 @@ def delete(data):
     cursor.execute(query, (task_id))
     conn.commit()
     conn.close()
-    resp='{"status":"ok","data":[]'
-    return resp
+    respObj={}
+    respObj["status"]="ok"
+    dataObj=[]
+    respObj["data"]=dataObj
+    return json.dumps(respObj)
 
