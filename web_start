@@ -1,1 +1,3 @@
-python webserver3h.py flaskapp:app
+#python webserver3h_.py flaskapp:app
+python flaskapp.py & disown
+#python flaskapp.py 

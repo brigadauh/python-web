@@ -1,11 +1,54 @@
+from functools import wraps
 from flask import jsonify,Response, request
 import os
 import datetime
 import os.path
 import db
 import json
-import schedule
+import requests
 
+import web_login
+import schedule
+import temphumidity
+import testviews
+import temphumidity_view
+
+def getUser(cookie):
+    conn = db.open()
+    cursor = conn.cursor()
+    
+    query =("select username from user_cookie "
+            "where cookie = %(cookie_value)s")
+
+    cursor.execute(query, {"cookie_value":cookie})
+    user=False
+    for (username) in cursor:
+      user=username
+    cursor.close()
+    return user
+
+
+
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        ret='{"status":"failed", "err":"authentication required","data":[]}'
+        cookie = request.cookies.get('api_cookie')
+        if cookie:
+            user = getUser(cookie)
+            if user:
+                # Success!
+                #return render_template('welcome.html', user=user)
+                ret= f(*args, **kwargs)
+        return ret 
+        
+        #username = "admin"
+        #password="secret"
+        #if not check_auth(username, password):
+        #    return authenticate()
+        #return f(*args, **kwargs)
+        
+    return decorated
 
 def root_dir():  # pragma: no cover
     return os.path.abspath(os.path.dirname(__file__))+'/public/'
@@ -25,6 +68,46 @@ default_page='index.html'
 
 def dispatch(flask_app,path):
     
+
+        
+    ##################### weather data
+    @flask_app.route('/api/weather/temphumidity/add', methods=['POST','DELETE'])
+    def temphumidity_handler_process():
+        return temphumidity.add_delete()
+
+    @flask_app.route('/api/weather/temphumidity/current', methods=['POST','GET'])
+    def temphumidity_handler_current():
+        return temphumidity.get_current()
+    
+    ########################## CHAT
+    @flask_app.route('/api/chat/users', methods=['POST'])
+    def chat_users():
+        json_obj=request.get_json()
+        resp=chat.get_users();
+        return Response(resp, mimetype='text/json')
+    
+    
+    ########################## default page
+    
+    @flask_app.route('/root')
+    @requires_auth
+    def root():
+        return Response(
+            'root:' + root_dir(),
+            mimetype='text/plain'
+        )
+    @flask_app.route('/login', methods=['POST','GET'])
+    def login():
+        uuid= web_login.authenticate()
+        resp='{"status":"failed"}'
+        if (uuid!=''):
+            resp='{"status":"ok"}'
+        response=Response(resp, mimetype='text/json')
+        if (uuid!=''):
+            response.set_cookie('api_cookie',value=uuid)
+        return response
+    
+    ##################### schedule (test)
     @flask_app.route('/api/schedule/list/active')
     def schedule_handler_active():
         resp=schedule.list_active()
@@ -46,50 +129,15 @@ def dispatch(flask_app,path):
         else:
             resp=schedule.delete(json_obj)
             return Response(resp, mimetype='text/json')
-            
     
-    
-    ########################## default page
-    @flask_app.route('/root')
-    def root():
-        return Response(
-            'root:' + root_dir(),
-            mimetype='text/plain'
-        )
-    ########################## test
-    @flask_app.route('/hello')
-    def hello_world():
-        return Response(
-            'Hello world from Flask\n',
-            mimetype='text/plain'
-        )
-    @flask_app.route('/api/user')
-    def user_handler():
-        resp='["status":"ok", data[{"page_status":"construction",version":"0.0"}]'
-        return Response(resp, mimetype='text/json')
-    
-    @flask_app.route('/api/user/list')
-    def user_list_handler():
-        conn = db.open()
-        cursor = conn.cursor()
-        
-        query =("select username,password from user "
-                "where username=%s and password=%s;")
-        username="petya"
-        password="qwerty"
-        date=datetime.date(2000,12,31)
-        
-        cursor.execute(query, (username, password))
-        data=[]
-        for (username, password) in cursor:
-          d="{0},  {1}".format(username, password)
-          data.append(d)
-        cursor.close()
-        data_json = json.dumps(data)
-        resp='["status":"ok", data['+data_json+']'
-        return Response(resp, mimetype='text/json')
-    
+    ########################## various tests
+    flask_app.add_url_rule('/hello', 'hello', view_func=testviews.hello_world)
+    flask_app.add_url_rule('/api/user', 'user', view_func=testviews.user_handler)
+    flask_app.add_url_rule('/api/user/list', 'user_list_handler', view_func=testviews.user_list_handler)
+
     @flask_app.route('/', defaults={'path': root_dir()+'/'+default_page})
+    
+
     @flask_app.route('/<path:path>')
     def get_resource(path):  # pragma: no cover
         mimetypes = {
@@ -105,7 +153,6 @@ def dispatch(flask_app,path):
         mimetype = mimetypes.get(ext, "text/html")
         content = get_file(complete_path)
         return Response(content, mimetype=mimetype)
-    
     #@flask_app.route('/<name>')
     #def hello_name(name):
     #    return "Hello {}!".format(name)

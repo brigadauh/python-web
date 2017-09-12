@@ -26,3 +26,18 @@ def checkConn(self):
         else:
             print ( "No connection with database." )
             return False    
+
+def verify_credentials(username,password):
+    conn = open()
+    cursor = conn.cursor()
+
+    args = [username, password]
+    cursor.callproc('api_login', args)
+    uuid=''
+    for (uid) in cursor:
+      uuid=uid
+    cursor.close()
+    if (uuid == '' ):
+        return ''
+    else:
+        return uuid        
