@@ -30,14 +30,27 @@ def checkConn(self):
 def verify_credentials(username,password):
     conn = open()
     cursor = conn.cursor()
-
-    args = [username, password]
+    args = (username, password)
     cursor.callproc('api_login', args)
     uuid=''
-    for (uid) in cursor:
-      uuid=uid
+    result_row=None
+    for result in cursor.stored_results():
+      result_row=result.fetchall()
+    ##print(result_row[0])
+    uuid= result_row[0][0].encode('utf-8')
     cursor.close()
-    if (uuid == '' ):
-        return ''
-    else:
-        return uuid        
+    close(conn)
+    return uuid        
+
+def create_user(username,password):
+    conn = open()
+    cursor = conn.cursor()
+    args = (username, password)
+    cursor.callproc('api_user_insert', args)
+    result_row=None
+    for result in cursor.stored_results():
+      result_row=result.fetchall()
+    print(result_row[0])
+    cursor.close()
+    close(conn)
+    return result_row[0]        

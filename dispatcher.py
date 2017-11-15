@@ -12,6 +12,8 @@ import schedule
 import temphumidity
 import testviews
 import temphumidity_view
+import api_response
+
 
 def getUser(cookie):
     conn = db.open()
@@ -96,16 +98,31 @@ def dispatch(flask_app,path):
             'root:' + root_dir(),
             mimetype='text/plain'
         )
-    @flask_app.route('/login', methods=['POST','GET'])
+    @flask_app.route('/api/login', methods=['POST'])
     def login():
         uuid= web_login.authenticate()
-        resp='{"status":"failed"}'
+        resp=api_response.responseErr('login_failed','Incorrect Username/Password')
+        print(uuid)
         if (uuid!=''):
-            resp='{"status":"ok"}'
+            resp=api_response.responseOK()
         response=Response(resp, mimetype='text/json')
         if (uuid!=''):
             response.set_cookie('api_cookie',value=uuid)
         return response
+    @flask_app.route('/api/create-account', methods=['POST'])
+    def create_acc():
+        uuid= web_login.create_account()
+        resp='{"status":"failed"}'
+        if (uuid!=''):
+            resp='{"status":1}'
+        response=Response(resp, mimetype='text/json')
+        if (uuid!=''):
+            response.set_cookie('api_cookie',value=uuid)
+        return response
+    
+    
+    
+    
     
     ##################### schedule (test)
     @flask_app.route('/api/schedule/list/active')
