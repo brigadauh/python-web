@@ -10,6 +10,7 @@ import requests
 import web_login
 import schedule
 import temphumidity
+import forecast
 import testviews
 import temphumidity_view
 import api_response
@@ -80,6 +81,10 @@ def dispatch(flask_app,path):
     @flask_app.route('/api/weather/temphumidity/current', methods=['POST','GET'])
     def temphumidity_handler_current():
         return temphumidity.get_current()
+
+    @flask_app.route('/api/weather/forecast', methods=['POST','GET'])
+    def forecast_handler():
+        return forecast.get_latest()
     
     ########################## CHAT
     @flask_app.route('/api/chat/users', methods=['POST'])
