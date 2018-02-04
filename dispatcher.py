@@ -14,6 +14,7 @@ import forecast
 import testviews
 import temphumidity_view
 import api_response
+#import utils.getforecast
 
 
 def getUser(cookie):
@@ -85,6 +86,11 @@ def dispatch(flask_app,path):
     @flask_app.route('/api/weather/forecast', methods=['POST','GET'])
     def forecast_handler():
         return forecast.get_latest()
+
+    #@flask_app.route('/api/weather/vendorforecast', methods=['POST','GET'])
+    #def vendor_forecast_handler():
+    #    resp=utils.getforecast.get_forecast_from_vendor()
+    #    return Response(resp, mimetype='text/json')
     
     ########################## CHAT
     @flask_app.route('/api/chat/users', methods=['POST'])
