@@ -8,7 +8,7 @@ def get_forecast_from_vendor():
     #logging.basicConfig()
     #logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
     forecast = requests.get("http://api.openweathermap.org/data/2.5/forecast?id=5097773&APPID=28f1e52bf99879940247f373318f70e5")
-    forecast_data= str(forecast.content)
+    forecast_data= forecast.content.decode("utf-8")
     forecast_obj=json.loads(forecast_data)
     if forecast_obj["cod"]=="200":
         location="Fair Lawn, NJ"

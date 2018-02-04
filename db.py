@@ -65,7 +65,7 @@ def create_user(username,password):
     result_row=None
     for result in cursor.fetchall_unbuffered()():
       result_row=result.fetchall()
-    print(result_row[0])
+    #print(result_row[0])
     cursor.close()
     close(conn)
     return result_row[0]        

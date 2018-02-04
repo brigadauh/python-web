@@ -16,6 +16,7 @@ def add(data):
     temp=data.get('t','')
     humidity=data.get('h','')
     time=data.get('d','')
+    #print (temp, humidity, time)
     conn = db.open()
     cursor = conn.cursor()
     query =("insert into weather_data " 
