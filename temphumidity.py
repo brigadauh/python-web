@@ -13,18 +13,19 @@ def add_delete():
         return Response(resp, mimetype='text/json')
 
 def add(data):
-    temp=data.get('t','')
-    humidity=data.get('h','')
-    time=data.get('d','')
+    temp = data.get('t','')
+    humidity = data.get('h','')
+    time = data.get('d','')
+    source = data.get('s','')
     #print (temp, humidity, time)
     conn = db.open()
     cursor = conn.cursor()
     query =("insert into weather_data " 
-            "(recorded_time,temp,humidity)"
-            " select %s, %s, %s; "
+            "(recorded_time,temp,humidity,source)"
+            " select %s, %s, %s, %s;"
            )
     
-    cursor.execute(query,(time, temp, humidity))
+    cursor.execute(query,(time, temp, humidity, source))
     conn.commit()
     var_task_id=cursor.lastrowid
     cursor.close()
@@ -35,7 +36,7 @@ def add(data):
     dataObj={}
     dataObj["id"]=var_task_id
     respObj["data"]=dataObj
-
+    print('temphumidity.add:',json.dumps(respObj))
     return json.dumps(respObj)
 
     
@@ -49,14 +50,14 @@ def get_current():
     
     conn = db.open()
     cursor = conn.cursor()
-    query =("select recorded_time,temp,humidity, (SELECT temp FROM weather_data WHERE recorded_time < DATE_ADD(w.`recorded_time`, INTERVAL -30 MINUTE) ORDER BY recorded_time DESC LIMIT 1) AS recent_temp "
-            " FROM weather_data w order by recorded_time desc limit 1;")
+    query =("select recorded_time,temp,humidity, (SELECT temp FROM weather_data WHERE recorded_time < DATE_ADD(w.`recorded_time`, INTERVAL -30 MINUTE) ORDER BY recorded_time DESC, source LIMIT 1) AS recent_temp, source "
+            " FROM weather_data w order by recorded_time desc, source limit 1;")
     cursor.execute(query)
     respObj={}
     respObj["status"]="ok"
     dataObj=[]
 
-    for (var_recorded_time, var_temp, var_humidity, var_recent_temp) in cursor:
+    for (var_recorded_time, var_temp, var_humidity, var_recent_temp, var_source) in cursor:
         print("time: {}, temp: {}, humidity: {}, recent temp: {}".format(
         var_recorded_time, var_temp, var_humidity, var_recent_temp))
         dataItem={}
@@ -64,6 +65,7 @@ def get_current():
         dataItem["temp"]=str(var_temp)
         dataItem["humidity"]=str(var_humidity)
         dataItem["recent_temp"]=str(var_recent_temp)
+        dataItem["source"] = var_source
         dataObj.append(dataItem)
 
     respObj["data"]=dataObj
