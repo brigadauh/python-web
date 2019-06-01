@@ -14,6 +14,7 @@ import forecast
 import testviews
 import temphumidity_view
 import api_response
+import photo
 #import utils.getforecast
 
 
@@ -157,6 +158,11 @@ def dispatch(flask_app,path):
         else:
             resp=schedule.delete(json_obj)
             return Response(resp, mimetype='text/json')
+    
+    @flask_app.route('/api/photo')
+    def photo_folder_scan():
+        resp=photo.folder_scan('/mnt/d/pic/')
+        return Response(resp, mimetype='text/json')
     
     ########################## various tests
     flask_app.add_url_rule('/hello', 'hello', view_func=testviews.hello_world)
