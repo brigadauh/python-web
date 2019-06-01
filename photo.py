@@ -10,8 +10,8 @@ def folder_scan(folder):
         for entry in entries:
             dataItem={}
             dataItem["name"]=str(entry.name)
-            dataItem["folder"]=entry.is_dir()
+            dataItem["isFolder"]=entry.is_dir()
             dataObj.append(dataItem)
     respObj["data"]=dataObj
-    return json.dumps(respObj)
+    return json.dumps(respObj, ensure_ascii=False)
 
