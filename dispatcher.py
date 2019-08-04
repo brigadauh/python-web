@@ -6,13 +6,10 @@ import os.path
 import db
 import json
 import requests
+import testviews
 
 import web_login
 import schedule
-import temphumidity
-import forecast
-import testviews
-import temphumidity_view
 import api_response
 import photo
 #import utils.getforecast
@@ -75,24 +72,24 @@ def dispatch(flask_app,path):
     
 
         
-    ##################### weather data
-    @flask_app.route('/api/weather/temphumidity/add', methods=['POST','DELETE'])
-    def temphumidity_handler_process():
-        return temphumidity.add_delete()
-
-    @flask_app.route('/api/weather/temphumidity/current', methods=['POST','GET'])
-    def temphumidity_handler_current():
-        return temphumidity.get_current()
-
-    @flask_app.route('/api/weather/forecast', methods=['POST','GET'])
-    def forecast_handler():
-        return forecast.get_latest()
-
-    #@flask_app.route('/api/weather/vendorforecast', methods=['POST','GET'])
-    #def vendor_forecast_handler():
-    #    resp=utils.getforecast.get_forecast_from_vendor()
-    #    return Response(resp, mimetype='text/json')
+   
     
+    ####################### PHOTO ALBUM
+    @flask_app.route('/api/photo', methods=['POST'])
+    def photo_folder_scan():
+        json_obj=request.get_json()
+        #print(json_obj)
+        if request.method == 'POST':
+            resp=photo.folder_scan('/mnt/d/pic'+json_obj.get('body','/'))
+            return resp
+    @flask_app.route('/api/photo/<path:path>', methods=['GET'])
+    def photo_get_file(path):
+            path = path.replace('../','')
+            print('/mnt/d/pic/'+ path)
+            return photo.get_file('/mnt/d/pic/'+ path)
+
+
+
     ########################## CHAT
     @flask_app.route('/api/chat/users', methods=['POST'])
     def chat_users():
@@ -101,6 +98,7 @@ def dispatch(flask_app,path):
         return Response(resp, mimetype='text/json')
     
     
+
     ########################## default page
     
     @flask_app.route('/root')
@@ -136,34 +134,31 @@ def dispatch(flask_app,path):
     
     
     
-    ##################### schedule (test)
-    @flask_app.route('/api/schedule/list/active')
-    def schedule_handler_active():
-        resp=schedule.list_active()
-        return Response(resp, mimetype='text/json')
-    @flask_app.route('/api/schedule/list/processed')
-    def schedule_handler_processed():
-        resp=schedule.list_processed()
-        return Response(resp, mimetype='text/json')
-    @flask_app.route('/api/schedule/list/current')
-    def schedule_handler_current():
-        resp=schedule.list_current()
-        return Response(resp, mimetype='text/json')
-    @flask_app.route('/api/schedule/add', methods=['POST','DELETE'])
-    def schedule_handler_process():
-        json_obj=request.get_json()
-        if request.method == 'POST':
-            resp=schedule.add(json_obj)
-            return Response(resp, mimetype='text/json')
-        else:
-            resp=schedule.delete(json_obj)
-            return Response(resp, mimetype='text/json')
-    
-    @flask_app.route('/api/photo')
-    def photo_folder_scan():
-        resp=photo.folder_scan('/mnt/d/pic/')
-        return Response(resp, mimetype='text/json')
-    
+    # ##################### schedule (test)
+    # @flask_app.route('/api/schedule/list/active')
+    # def schedule_handler_active():
+    #     resp=schedule.list_active()
+    #     return Response(resp, mimetype='text/json')
+    # @flask_app.route('/api/schedule/list/processed')
+    # def schedule_handler_processed():
+    #     resp=schedule.list_processed()
+    #     return Response(resp, mimetype='text/json')
+    # @flask_app.route('/api/schedule/list/current')
+    # def schedule_handler_current():
+    #     resp=schedule.list_current()
+    #     return Response(resp, mimetype='text/json')
+    # @flask_app.route('/api/schedule/add', methods=['POST','DELETE'])
+    # def schedule_handler_process():
+    #     json_obj=request.get_json()
+    #     if request.method == 'POST':
+    #         resp=schedule.add(json_obj)
+    #         return Response(resp, mimetype='text/json')
+    #     else:
+    #         resp=schedule.delete(json_obj)
+    #         return Response(resp, mimetype='text/json')
+    # 
+    # 
+
     ########################## various tests
     flask_app.add_url_rule('/hello', 'hello', view_func=testviews.hello_world)
     flask_app.add_url_rule('/api/user', 'user', view_func=testviews.user_handler)
