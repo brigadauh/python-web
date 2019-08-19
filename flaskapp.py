@@ -1,6 +1,7 @@
 from dispatcher import dispatch
 from dispatcher_schedule import dispatch as dispatch_schedule
 from dispatcher_weather import dispatch as dispatch_weather
+from dispatcher_photo import dispatch as dispatch_photo
 from flask import Flask, render_template
 import os
 import datetime
@@ -34,4 +35,5 @@ flask_app = Flask(__name__, static_url_path='', static_folder='public')
 dispatch(flask_app,'')
 dispatch_schedule(flask_app,'')
 dispatch_weather(flask_app,'')
+dispatch_photo(flask_app,'')
 flask_app.run(host='192.168.1.3', port=int(os.environ.get("PORT", 8888)))
