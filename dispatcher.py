@@ -55,7 +55,7 @@ def requires_auth(f):
 def root_dir():  # pragma: no cover
     return os.path.abspath(os.path.dirname(__file__))+'/public/'
 def get_file(filename):  # pragma: no cover
-    print(filename)
+    # print(filename)
     try:
         src = os.path.join(root_dir(), filename)
         # Figure out how flask returns static files
