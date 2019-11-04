@@ -52,5 +52,8 @@ def get_file(path, token):
     if  root_path == '':
         path = ''
     else :
-        path = '/mnt/d/pic'+root_path+path
+        if not root_path.endswith('/'):
+            root_path = root_path+ '/'
+        path = '/mnt/d/pic' + root_path  + path
+    print('file path:***************', path)
     return send_file(path, mimetype='image/jpg')
